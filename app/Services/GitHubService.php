@@ -62,4 +62,15 @@ class GitHubService
         $query = "repo:{$this->repo} is:pr is:open review:none";
         return $this->fetchPullRequests($query);
     }
+
+    public function getRateLimit()
+    {
+        try {
+            $response = $this->client->get("rate_limit");
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (\Exception $e) {
+            Log::error("Error fetching rate limit: " . $e->getMessage());
+            return null;
+        }
+    }
 }

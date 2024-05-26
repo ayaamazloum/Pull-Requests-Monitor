@@ -20,6 +20,9 @@ class FetchPullRequests extends Command
     
     public function handle()
     {
+        $rateLimit = $this->githubService->getRateLimit();
+        $this->info("Rate Limit: " . print_r($rateLimit, true));
+
         $this->fetchAndSave('Old Pull Requests', '1-old-pull-requests.txt', [$this->githubService, 'getOldPullRequests']);
         $this->fetchAndSave('Review Required Pull Requests', '2-review-required-pull-requests.txt', [$this->githubService, 'getReviewRequiredPullRequests']);
         $this->fetchAndSave('Successful Pull Requests', '3-successful-pull-requests.txt', [$this->githubService, 'getSuccessfulPullRequests']);
