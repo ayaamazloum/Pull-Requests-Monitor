@@ -56,4 +56,10 @@ class GitHubService
         $query = "repo:{$this->repo} is:pr is:open status:success";
         return $this->fetchPullRequests($query);
     }
+
+    public function getNoReviewRequestedPullRequests()
+    {
+        $query = "repo:{$this->repo} is:pr is:open review:none";
+        return $this->fetchPullRequests($query);
+    }
 }
