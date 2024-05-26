@@ -44,4 +44,10 @@ class GitHubService
         $query = "repo:{$this->repo} is:pr is:open created:<" . now()->subDays(14)->toDateString();
         return $this->fetchPullRequests($query);
     }
+
+    public function getReviewRequiredPullRequests()
+    {
+        $query = "repo:{$this->repo} is:pr is:open review:required";
+        return $this->fetchPullRequests($query);
+    }
 }
