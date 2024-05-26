@@ -39,7 +39,17 @@ class GitHubService
         } catch (ServerException $e) {
             Log::error("Server error fetching pull requests: " . $e->getMessage());
         } catch (RequestException $e) {
-            Log::error("Request error fetching pull requests: " . $e->getMessage());
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                if ($statusCode == 403) {
+                    Log::error("API rate limit exceeded: " . $e->getMessage());
+                } else {
+                    Log::error("HTTP error occurred: " . $e->getMessage());
+                }
+            } else {
+                Log::error("Network error occurred: " . $e->getMessage());
+            }
+            return null;
         } catch (\Exception $e) {
             Log::error("Unexpected error fetching pull requests: " . $e->getMessage());
         }
@@ -68,17 +78,6 @@ class GitHubService
     {
         $query = "repo:{$this->repo} is:pr is:open review:none";
         return $this->fetchPullRequests($query);
-    }
-
-    public function getRateLimit()
-    {
-        try {
-            $response = $this->client->get("rate_limit");
-            return json_decode($response->getBody()->getContents(), true);
-        } catch (\Exception $e) {
-            Log::error("Error fetching rate limit: " . $e->getMessage());
-            return null;
-        }
     }
 
     protected function retry($times, $sleep, callable $callback)
