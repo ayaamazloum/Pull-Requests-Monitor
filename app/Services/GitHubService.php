@@ -50,4 +50,10 @@ class GitHubService
         $query = "repo:{$this->repo} is:pr is:open review:required";
         return $this->fetchPullRequests($query);
     }
+
+    public function getSuccessfulPullRequests()
+    {
+        $query = "repo:{$this->repo} is:pr is:open status:success";
+        return $this->fetchPullRequests($query);
+    }
 }
