@@ -6,19 +6,16 @@ use Illuminate\Console\Command;
 
 class FetchPullRequests extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:fetch-pull-requests';
+    protected $signature = 'fetch:pullrequests';
+    protected $description = 'Fetch pull requests from GitHub';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
+    protected $githubService;
+    
+    public function __construct(GitHubService $githubService)
+    {
+        parent::__construct();
+        $this->githubService = $githubService;
+    }
 
     /**
      * Execute the console command.
