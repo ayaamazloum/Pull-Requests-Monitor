@@ -26,17 +26,24 @@ class GitHubService
     {
         Log::info("Fetching PRs with query: $query");
         try {
-            $response = $this->client->get("search/issues", [
-                'query' => [
-                    'q' => $query,
-                ]
-            ]);
-
-            return json_decode($response->getBody()->getContents(), true);
+            return $this->retry(3, 100, function () use ($query) {
+                $response = $this->client->get("search/issues", [
+                    'query' => [
+                        'q' => $query,
+                    ]
+                ]);
+                return json_decode($response->getBody()->getContents(), true);
+            });
+        } catch (ClientException $e) {
+            Log::error("Client error fetching pull requests: " . $e->getMessage());
+        } catch (ServerException $e) {
+            Log::error("Server error fetching pull requests: " . $e->getMessage());
+        } catch (RequestException $e) {
+            Log::error("Request error fetching pull requests: " . $e->getMessage());
         } catch (\Exception $e) {
-            Log::error("Error fetching pull requests: " . $e->getMessage());
-            return null;
+            Log::error("Unexpected error fetching pull requests: " . $e->getMessage());
         }
+        return null;
     }
 
     public function getOldPullRequests()
@@ -71,6 +78,25 @@ class GitHubService
         } catch (\Exception $e) {
             Log::error("Error fetching rate limit: " . $e->getMessage());
             return null;
+        }
+    }
+
+    protected function retry($times, $sleep, callable $callback)
+    {
+        $attempts = 0;
+
+        beginning:
+        $attempts++;
+
+        try {
+            return $callback();
+        } catch (\Exception $e) {
+            if ($attempts < $times) {
+                usleep($sleep * 1000);
+                goto beginning;
+            }
+
+            throw $e;
         }
     }
 }
