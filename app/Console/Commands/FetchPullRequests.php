@@ -21,6 +21,9 @@ class FetchPullRequests extends Command
     public function handle()
     {
         $this->fetchAndSave('Old Pull Requests', '1-old-pull-requests.txt', [$this->githubService, 'getOldPullRequests']);
+        $this->fetchAndSave('Review Required Pull Requests', '2-review-required-pull-requests.txt', [$this->githubService, 'getReviewRequiredPullRequests']);
+        $this->fetchAndSave('Successful Pull Requests', '3-successful-pull-requests.txt', [$this->githubService, 'getSuccessfulPullRequests']);
+        $this->fetchAndSave('No Review Requested Pull Requests', '4-no-review-requested-pull-requests.txt', [$this->githubService, 'getNoReviewRequestedPullRequests']);
     }
 
     protected function fetchAndSave($title, $filename, $fetchMethod)
